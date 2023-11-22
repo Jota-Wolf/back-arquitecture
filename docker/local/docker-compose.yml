@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ../..
+      dockerfile: docker/local/app.dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db-tormaker
+    networks:
+      - tormaker-network
+    volumes:
+      - ../../:/usr/src/app
+      - /usr/src/app/node_modules
+
+  db-tormaker:
+    container_name: db-tormaker
+    image: 'postgres:latest'
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=db-tormaker
+    networks:
+      - tormaker-network
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+volumes:
+  db-tormaker:
+
+networks:
+  tormaker-network:
+    driver: bridge
+    name: tormaker-network
