@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { IUserRepository } from './repository/user.interface';
-import { USER_REPOSITORY } from './user.constants';
+import { CreateUserDto } from '../domain/dto/create-user.dto';
+import { UpdateUserDto } from '../domain/dto/update-user.dto';
+import { IUserRepository } from '../domain/interfaces/user-repository.interface';
+import { USER_REPOSITORY } from '../types/user.constants';
 
 @Injectable()
 export class UserService {
