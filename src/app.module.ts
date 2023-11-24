@@ -1,8 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
-import { PrismaService } from './common/services/prisma.service';
+import { UserModule } from './user/application/user.module';
+import { PrismaService } from './shared/services/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Global()
