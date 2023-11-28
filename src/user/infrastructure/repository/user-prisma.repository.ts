@@ -1,14 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/services/prisma.service';
-import { User } from '../../domain/entities/user.entity';
+import {
+  User,
+  ResponseUser,
+  FindAllParams,
+} from '../../domain/entities/user.entity';
 import { IUserRepository } from '../../domain/interfaces/user-repository.interface';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(): Promise<User[]> {
-    return this.prismaService.user.findMany();
+  async findAll(params: FindAllParams): Promise<ResponseUser> {
+    const { skip, take, orderBy } = params;
+    const where: Prisma.UserWhereInput = {};
+
+    const [users, total] = await Promise.all([
+      this.prismaService.user.findMany({
+        where,
+        orderBy,
+        skip,
+        take,
+      }),
+      this.prismaService.user.count({ where }),
+    ]);
+
+    console.log('users', users);
+    console.log('total', total);
+
+    return {
+      data: users,
+      total,
+    };
   }
 
   async findById(id: number): Promise<User | null> {
