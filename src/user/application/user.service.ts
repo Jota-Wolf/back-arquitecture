@@ -3,6 +3,7 @@ import { CreateUserDto } from '../domain/dto/create-user.dto';
 import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { IUserRepository } from '../domain/interfaces/user-repository.interface';
 import { USER_REPOSITORY } from '../types/user.constants';
+import { FindAllUserParamDto } from '../domain/dto/param-findAll-user.dto';
 
 @Injectable()
 export class UserService {
@@ -11,8 +12,8 @@ export class UserService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async findAll() {
-    return this.userRepository.findAll();
+  async findAll(params: FindAllUserParamDto) {
+    return this.userRepository.findAll(params);
   }
 
   async findById(id: number) {

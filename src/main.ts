@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,9 @@ async function bootstrap() {
     allowedHeaders: configService.get('CORS_ALLOWED_HEADERS').split(','),
     credentials: configService.get('CORS_CREDENTIALS') === 'true',
   });
+  app.useGlobalPipes(
+    new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }),
+  );
   await app.listen(3000);
 }
 bootstrap();
