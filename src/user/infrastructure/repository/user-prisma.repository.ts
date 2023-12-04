@@ -3,16 +3,17 @@ import { PrismaService } from '../../../shared/services/prisma.service';
 import {
   User,
   ResponseUser,
-  FindAllParams,
+  UserFindAllParams,
 } from '../../domain/entities/user.entity';
 import { IUserRepository } from '../../domain/interfaces/user-repository.interface';
 import { Prisma } from '@prisma/client';
+import { UserParamDto } from 'src/user/domain/dto/update-user.dto';
 
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(params: FindAllParams): Promise<ResponseUser> {
+  async findAll(params: UserFindAllParams): Promise<ResponseUser> {
     const { skip, take, orderBy } = params;
     const where: Prisma.UserWhereInput = {};
 
@@ -35,24 +36,33 @@ export class UserPrismaRepository implements IUserRepository {
     };
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById({ id }: UserParamDto): Promise<User | null> {
     return this.prismaService.user.findUnique({
       where: { id },
     });
   }
 
   async create(data: User): Promise<User> {
-    return this.prismaService.user.create({ data });
+    const userData: Prisma.UserCreateInput = {
+      email: data.email,
+      name: data.name,
+      role: {
+        connect: {
+          id: data.roleId,
+        },
+      },
+    };
+    return this.prismaService.user.create({ data: userData });
   }
 
-  async update(id: number, data: User): Promise<User> {
+  async update({ id }: UserParamDto, data: User): Promise<User> {
     return this.prismaService.user.update({
       where: { id },
       data,
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete({ id }: UserParamDto): Promise<void> {
     await this.prismaService.user.delete({
       where: { id },
     });

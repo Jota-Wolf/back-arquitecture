@@ -1,7 +1,7 @@
 export class User {
-  id?: number;
+  roleId: string;
   email: string;
-  name?: string;
+  name: string;
 }
 
 export class UserOrder {
@@ -9,7 +9,7 @@ export class UserOrder {
   email?: 'asc' | 'desc';
 }
 
-export class FindAllParams {
+export class UserFindAllParams {
   skip?: number;
   take?: number;
   orderBy?: UserOrder;

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../../application/user.service';
 import { CreateUserDto } from '../../domain/dto/create-user.dto';
-import { UpdateUserDto } from '../../domain/dto/update-user.dto';
+import { UpdateUserDto, UserParamDto } from '../../domain/dto/update-user.dto';
 import { FindAllUserParamDto } from 'src/user/domain/dto/param-findAll-user.dto';
 
 @Controller('users')
@@ -28,17 +28,17 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findById(+id);
+  findOne(@Param() { id }: UserParamDto) {
+    return this.userService.findById({ id });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param() { id }: UserParamDto, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update({ id }, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.delete(+id);
+  remove(@Param() { id }: UserParamDto) {
+    return this.userService.delete({ id });
   }
 }
