@@ -47,9 +47,9 @@ export class RolePrismaRepository implements IRoleRepository {
       };
       return await this.prismaService.role.create({ data: roleData });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'Role',
-        uniqueFields: ['name'],
+      handlePrismaError({
+        error,
+        context: { modelName: 'Role', uniqueFields: ['name'] },
       });
     }
   }
@@ -61,11 +61,14 @@ export class RolePrismaRepository implements IRoleRepository {
         data,
       });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'Role',
-        uniqueFields: ['name'],
-        idFieldName: 'id',
-        id,
+      handlePrismaError({
+        error,
+        context: {
+          modelName: 'Role',
+          uniqueFields: ['name'],
+          idFieldName: 'id',
+          id,
+        },
       });
     }
   }
@@ -76,10 +79,9 @@ export class RolePrismaRepository implements IRoleRepository {
         where: { id },
       });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'Role',
-        idFieldName: 'id',
-        id,
+      handlePrismaError({
+        error,
+        context: { modelName: 'Role', idFieldName: 'id', id },
       });
     }
   }

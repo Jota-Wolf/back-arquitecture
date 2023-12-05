@@ -4,16 +4,9 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { type PrismaError } from '../types/prisma-error-handler.type';
 
-export function handlePrismaError(
-  error: any,
-  context?: {
-    uniqueFields?: string[];
-    modelName: string;
-    idFieldName?: string;
-    id?: string;
-  },
-) {
+export function handlePrismaError({ error, context }: PrismaError) {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
       const field = error.meta?.target?.[0];
