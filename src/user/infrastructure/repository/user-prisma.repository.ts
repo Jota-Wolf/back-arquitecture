@@ -53,9 +53,9 @@ export class UserPrismaRepository implements IUserRepository {
       };
       return await this.prismaService.user.create({ data: userData });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'User',
-        uniqueFields: ['email'],
+      handlePrismaError({
+        error,
+        context: { modelName: 'User', uniqueFields: ['email'] },
       });
     }
   }
@@ -67,11 +67,14 @@ export class UserPrismaRepository implements IUserRepository {
         data,
       });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'User',
-        uniqueFields: ['email'],
-        idFieldName: 'id',
-        id,
+      handlePrismaError({
+        error,
+        context: {
+          modelName: 'User',
+          uniqueFields: ['email'],
+          idFieldName: 'id',
+          id,
+        },
       });
     }
   }
@@ -82,10 +85,9 @@ export class UserPrismaRepository implements IUserRepository {
         where: { id },
       });
     } catch (error) {
-      handlePrismaError(error, {
-        modelName: 'User',
-        idFieldName: 'id',
-        id,
+      handlePrismaError({
+        error,
+        context: { modelName: 'User', idFieldName: 'id', id },
       });
     }
   }
