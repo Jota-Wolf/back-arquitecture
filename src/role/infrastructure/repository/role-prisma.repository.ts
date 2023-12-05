@@ -4,10 +4,11 @@ import {
   ResponseRole,
   Role,
   RoleFindAllParams,
-} from 'src/role/domain/entities/role.entity';
+} from '../../domain/entities/role.entity';
 import { IRoleRepository } from '../../domain/interfaces/role-repository.interface';
 import { Prisma } from '@prisma/client';
-import { RoleParamDto } from 'src/role/domain/dto/update-role.dto';
+import { RoleParamDto } from '../../domain/dto/update-role.dto';
+import { handlePrismaError } from '../../../shared/helpers/prisma-error.handler';
 
 @Injectable()
 export class RolePrismaRepository implements IRoleRepository {
@@ -27,9 +28,6 @@ export class RolePrismaRepository implements IRoleRepository {
       this.prismaService.role.count({ where }),
     ]);
 
-    console.log('roles', roles);
-    console.log('total', total);
-
     return {
       data: roles,
       total,
@@ -37,28 +35,52 @@ export class RolePrismaRepository implements IRoleRepository {
   }
 
   async findById({ id }: RoleParamDto): Promise<Role | null> {
-    return this.prismaService.role.findUnique({
+    return await this.prismaService.role.findUnique({
       where: { id },
     });
   }
 
   async create(data: Role): Promise<Role> {
-    const roleData: Prisma.RoleCreateInput = {
-      name: data.name,
-    };
-    return this.prismaService.role.create({ data: roleData });
+    try {
+      const roleData: Prisma.RoleCreateInput = {
+        name: data.name,
+      };
+      return await this.prismaService.role.create({ data: roleData });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'Role',
+        uniqueFields: ['name'],
+      });
+    }
   }
 
   async update({ id }: RoleParamDto, data: Role): Promise<Role> {
-    return this.prismaService.role.update({
-      where: { id },
-      data,
-    });
+    try {
+      return await this.prismaService.role.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'Role',
+        uniqueFields: ['name'],
+        idFieldName: 'id',
+        id,
+      });
+    }
   }
 
   async delete({ id }: RoleParamDto): Promise<void> {
-    await this.prismaService.role.delete({
-      where: { id },
-    });
+    try {
+      await this.prismaService.role.delete({
+        where: { id },
+      });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'Role',
+        idFieldName: 'id',
+        id,
+      });
+    }
   }
 }
