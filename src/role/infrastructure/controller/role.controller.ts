@@ -20,7 +20,6 @@ export class RoleController {
 
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {
-    console.log('createRoleDto', createRoleDto);
     return this.roleService.create(createRoleDto);
   }
 

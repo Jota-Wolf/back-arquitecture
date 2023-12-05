@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from '../domain/dto/create-role.dto';
 import { RoleParamDto, UpdateRoleDto } from '../domain/dto/update-role.dto';
 import { IRoleRepository } from '../domain/interfaces/role-repository.interface';
@@ -13,22 +13,27 @@ export class RoleService {
   ) {}
 
   async findAll(params: FindAllRoleParamDto) {
-    return this.roleRepository.findAll(params);
+    return await this.roleRepository.findAll(params);
   }
 
+  //Depends on the use case being implemented, an exception can be thrown or not
   async findById({ id }: RoleParamDto) {
-    return this.roleRepository.findById({ id });
+    const role = await this.roleRepository.findById({ id });
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+    return role;
   }
 
   async create(data: CreateRoleDto) {
-    return this.roleRepository.create(data);
+    return await this.roleRepository.create(data);
   }
 
   async update({ id }: RoleParamDto, data: UpdateRoleDto) {
-    return this.roleRepository.update({ id }, data);
+    return await this.roleRepository.update({ id }, data);
   }
 
   async delete({ id }: RoleParamDto) {
-    return this.roleRepository.delete({ id });
+    return await this.roleRepository.delete({ id });
   }
 }

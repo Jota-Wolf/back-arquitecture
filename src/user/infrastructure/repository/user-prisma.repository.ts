@@ -8,6 +8,7 @@ import {
 import { IUserRepository } from '../../domain/interfaces/user-repository.interface';
 import { Prisma } from '@prisma/client';
 import { UserParamDto } from 'src/user/domain/dto/update-user.dto';
+import { handlePrismaError } from 'src/shared/helpers/prisma-error.handler';
 
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
@@ -27,9 +28,6 @@ export class UserPrismaRepository implements IUserRepository {
       this.prismaService.user.count({ where }),
     ]);
 
-    console.log('users', users);
-    console.log('total', total);
-
     return {
       data: users,
       total,
@@ -37,34 +35,58 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   async findById({ id }: UserParamDto): Promise<User | null> {
-    return this.prismaService.user.findUnique({
+    return await this.prismaService.user.findUnique({
       where: { id },
     });
   }
 
   async create(data: User): Promise<User> {
-    const userData: Prisma.UserCreateInput = {
-      email: data.email,
-      name: data.name,
-      role: {
-        connect: {
-          id: data.roleId,
+    try {
+      const userData: Prisma.UserCreateInput = {
+        email: data.email,
+        name: data.name,
+        role: {
+          connect: {
+            id: data.roleId,
+          },
         },
-      },
-    };
-    return this.prismaService.user.create({ data: userData });
+      };
+      return await this.prismaService.user.create({ data: userData });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'User',
+        uniqueFields: ['email'],
+      });
+    }
   }
 
   async update({ id }: UserParamDto, data: User): Promise<User> {
-    return this.prismaService.user.update({
-      where: { id },
-      data,
-    });
+    try {
+      return await this.prismaService.user.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'User',
+        uniqueFields: ['email'],
+        idFieldName: 'id',
+        id,
+      });
+    }
   }
 
   async delete({ id }: UserParamDto): Promise<void> {
-    await this.prismaService.user.delete({
-      where: { id },
-    });
+    try {
+      await this.prismaService.user.delete({
+        where: { id },
+      });
+    } catch (error) {
+      handlePrismaError(error, {
+        modelName: 'User',
+        idFieldName: 'id',
+        id,
+      });
+    }
   }
 }
