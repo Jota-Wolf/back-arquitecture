@@ -56,9 +56,12 @@ export class RolePrismaRepository implements IRoleRepository {
 
   async update({ id }: RoleParamDto, data: Role): Promise<Role> {
     try {
+      const updateData: Partial<Role> = {
+        ...data,
+      };
       return await this.prismaService.role.update({
         where: { id },
-        data,
+        data: updateData,
       });
     } catch (error) {
       handlePrismaError({

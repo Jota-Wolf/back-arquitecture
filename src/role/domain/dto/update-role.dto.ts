@@ -1,8 +1,11 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRoleDto } from './create-role.dto';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { RoleEnum } from 'src/role/types/role.constants';
 
-export class UpdateRoleDto extends PartialType(CreateRoleDto) {}
+export class UpdateRoleDto {
+  @IsEnum(RoleEnum)
+  @IsOptional()
+  name?: string;
+}
 
 export class RoleParamDto {
   @IsUUID()
