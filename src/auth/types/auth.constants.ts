@@ -1,0 +1,2 @@
+export const TOKEN_SERVICE = 'TOKEN_SERVICE';
+export const AUTH_SERVICE = 'AUTH_SERVICE';
