@@ -9,6 +9,7 @@ import { IRoleRepository } from '../../domain/interfaces/role-repository.interfa
 import { Prisma } from '@prisma/client';
 import { RoleParamDto } from '../../domain/dto/update-role.dto';
 import { handlePrismaError } from '../../../shared/helpers/prisma-error.handler';
+import { CreateRoleDto } from '../../../role/domain/dto/create-role.dto';
 
 @Injectable()
 export class RolePrismaRepository implements IRoleRepository {
@@ -40,7 +41,7 @@ export class RolePrismaRepository implements IRoleRepository {
     });
   }
 
-  async create(data: Role): Promise<Role> {
+  async create(data: CreateRoleDto): Promise<Role> {
     try {
       const roleData: Prisma.RoleCreateInput = {
         name: data.name,

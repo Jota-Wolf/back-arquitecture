@@ -11,8 +11,8 @@ import {
 import { RoleService } from '../../application/role.service';
 import { CreateRoleDto } from '../../domain/dto/create-role.dto';
 import { UpdateRoleDto } from '../../domain/dto/update-role.dto';
-import { FindAllRoleParamDto } from 'src/role/domain/dto/param-findAll-role.dto';
-import { UserParamDto } from 'src/user/domain/dto/update-user.dto';
+import { FindAllRoleParamDto } from '../../../role/domain/dto/param-findAll-role.dto';
+import { UserIdParamDto } from '../../../user/domain/dto/param-findOne-user.dto';
 
 @Controller('roles')
 export class RoleController {
@@ -29,17 +29,20 @@ export class RoleController {
   }
 
   @Get(':id')
-  findOne(@Param() { id }: UserParamDto) {
+  findOne(@Param() { id }: UserIdParamDto) {
     return this.roleService.findById({ id });
   }
 
   @Patch(':id')
-  update(@Param() { id }: UserParamDto, @Body() updateRoleDto: UpdateRoleDto) {
+  update(
+    @Param() { id }: UserIdParamDto,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ) {
     return this.roleService.update({ id }, updateRoleDto);
   }
 
   @Delete(':id')
-  remove(@Param() { id }: UserParamDto) {
+  remove(@Param() { id }: UserIdParamDto) {
     return this.roleService.delete({ id });
   }
 }
