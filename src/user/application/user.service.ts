@@ -1,12 +1,15 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from '../domain/dto/create-user.dto';
-import { UpdateUserDto, UserParamDto } from '../domain/dto/update-user.dto';
+import { UpdateUserDto } from '../domain/dto/update-user.dto';
 import { IUserRepository } from '../domain/interfaces/user-repository.interface';
-import { USER_REPOSITORY } from '../types/user.constants';
+import { User } from '../domain/entities/user.entity';
 import { FindAllUserParamDto } from '../domain/dto/param-findAll-user.dto';
-import { ROLE_REPOSITORY } from '../../role/types/role.constants';
 import { IRoleRepository } from '../../role/domain/interfaces/role-repository.interface';
 import { RoleParamDto } from '../../role/domain/dto/update-role.dto';
+import { USER_REPOSITORY } from '../types/user.constants';
+import { ROLE_REPOSITORY } from '../../role/types/role.constants';
+import { omitSensitiveUserData } from '../domain/utils/user.utils';
+import { UserIdParamDto } from '../domain/dto/param-findOne-user.dto';
 
 @Injectable()
 export class UserService {
@@ -31,21 +34,39 @@ export class UserService {
     return await this.userRepository.findAll(params);
   }
 
-  async findById({ id }: UserParamDto) {
+  async findById({ id }: UserIdParamDto) {
     return await this.userRepository.findById({ id });
   }
 
-  async create(data: CreateUserDto) {
-    await this.checkRoleExists({ id: data?.roleId });
-    return await this.userRepository.create(data);
+  async create(data: CreateUserDto, roleId: string): Promise<User> {
+    await this.checkRoleExists({ id: roleId });
+    const userWithSensitiveData = await this.userRepository.create(
+      data,
+      roleId,
+    );
+    const userWithoutSensitiveData = omitSensitiveUserData(
+      userWithSensitiveData,
+    );
+    return userWithoutSensitiveData;
   }
 
-  async update({ id }: UserParamDto, data: UpdateUserDto) {
+  async update({ id }: UserIdParamDto, data: UpdateUserDto): Promise<User> {
     await this.checkRoleExists({ id: data?.roleId });
-    return await this.userRepository.update({ id }, data);
+    const user = await this.userRepository.findById({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const userWithSensitiveData = await this.userRepository.update(
+      { id },
+      data,
+    );
+    const userWithoutSensitiveData = omitSensitiveUserData(
+      userWithSensitiveData,
+    );
+    return userWithoutSensitiveData;
   }
 
-  async delete({ id }: UserParamDto) {
+  async delete({ id }: UserIdParamDto) {
     return await this.userRepository.delete({ id });
   }
 }
