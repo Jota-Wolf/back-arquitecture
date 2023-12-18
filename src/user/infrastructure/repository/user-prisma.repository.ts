@@ -1,14 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../shared/services/prisma.service';
 import {
   User,
   ResponseUser,
   UserFindAllParams,
+  CreateUser,
 } from '../../domain/entities/user.entity';
 import { IUserRepository } from '../../domain/interfaces/user-repository.interface';
-import { Prisma } from '@prisma/client';
-import { UserParamDto } from 'src/user/domain/dto/update-user.dto';
-import { handlePrismaError } from 'src/shared/helpers/prisma-error.handler';
+import {
+  UserEmailParamDto,
+  UserIdParamDto,
+} from '../../../user/domain/dto/param-findOne-user.dto';
+import { handlePrismaError } from '../../../shared/helpers/prisma-error.handler';
+import {
+  buildUserPrismaData,
+  selectUserFieldsPrisma,
+} from './user-prisma.utils';
 
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
@@ -20,6 +28,7 @@ export class UserPrismaRepository implements IUserRepository {
 
     const [users, total] = await Promise.all([
       this.prismaService.user.findMany({
+        select: selectUserFieldsPrisma,
         where,
         orderBy,
         skip,
@@ -34,24 +43,25 @@ export class UserPrismaRepository implements IUserRepository {
     };
   }
 
-  async findById({ id }: UserParamDto): Promise<User | null> {
+  async findById({ id }: UserIdParamDto): Promise<User | null> {
     return await this.prismaService.user.findUnique({
       where: { id },
     });
   }
 
-  async create(data: User): Promise<User> {
+  async findByEmail({ email }: UserEmailParamDto): Promise<CreateUser | null> {
+    return await this.prismaService.user.findUnique({
+      where: { email },
+    });
+  }
+
+  async create(data: CreateUser, roleId: string): Promise<User> {
     try {
-      const userData: Prisma.UserCreateInput = {
-        email: data.email,
-        name: data.name,
-        role: {
-          connect: {
-            id: data.roleId,
-          },
-        },
-      };
-      return await this.prismaService.user.create({ data: userData });
+      const userData = buildUserPrismaData({ ...data, roleId });
+      return await this.prismaService.user.create({
+        data: userData,
+        select: selectUserFieldsPrisma,
+      });
     } catch (error) {
       handlePrismaError({
         error,
@@ -60,11 +70,15 @@ export class UserPrismaRepository implements IUserRepository {
     }
   }
 
-  async update({ id }: UserParamDto, data: User): Promise<User> {
+  async update({ id }: UserIdParamDto, data: User): Promise<User> {
     try {
+      const updateData: Partial<User> = {
+        ...data,
+      };
       return await this.prismaService.user.update({
         where: { id },
-        data,
+        data: updateData,
+        select: selectUserFieldsPrisma,
       });
     } catch (error) {
       handlePrismaError({
@@ -79,7 +93,7 @@ export class UserPrismaRepository implements IUserRepository {
     }
   }
 
-  async delete({ id }: UserParamDto): Promise<void> {
+  async delete({ id }: UserIdParamDto): Promise<void> {
     try {
       await this.prismaService.user.delete({
         where: { id },

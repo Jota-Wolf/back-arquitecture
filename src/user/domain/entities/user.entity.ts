@@ -1,7 +1,14 @@
 export class User {
+  id: string;
   roleId: string;
   email: string;
   name: string;
+  isVerified: boolean;
+  isSuscribed: boolean;
+}
+
+export class CreateUser extends User {
+  password: string;
 }
 
 export class UserOrder {
