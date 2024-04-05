@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
-import { RoleEnum } from 'src/role/types/role.constants';
+import { RoleEnum } from '../../../role/types/role.constants';
 
 export class UpdateRoleDto {
   @IsEnum(RoleEnum)

@@ -8,11 +8,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from '../../application/user.service';
-
 import { UpdateUserDto } from '../../domain/dto/update-user.dto';
-
-import { FindAllUserParamDto } from 'src/user/domain/dto/param-findAll-user.dto';
-import { UserIdParamDto } from 'src/user/domain/dto/param-findOne-user.dto';
+import { FindAllUserParamDto } from '../../../user/domain/dto/param-findAll-user.dto';
+import { UserIdParamDto } from '../../../user/domain/dto/param-findOne-user.dto';
 
 @Controller('users')
 export class UserController {

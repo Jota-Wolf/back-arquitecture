@@ -37,3 +37,4 @@ lerna-debug.log*
 /docker/local/postgres-data
 
 .env
+yarn.lock
